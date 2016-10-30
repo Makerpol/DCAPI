@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>line chart</title>
+    <script src="../lib/jquery.min.js"></script>
+    <script src="../lib/d3.v3.min.js"></script>
+    <script src="../lib/dc.min.js"></script>
+    <script src="../lib/crossfilter.min.js"></script>
+    <script src="../js/data.js"></script>
+    <link type="text/css" rel="stylesheet" href="../css/dc.css">
+
+</head>
+<body>
+<div id="lineDiv"></div>
+<script type="text/javascript">
+
+    var sourceData = jQuery.parseJSON(pieData);
+
+    var time = sourceData.flowdata[0].duration;
+
+    var step = (sourceData.flowdata[0].widgetList[sourceData.flowdata[0].namelist.length].time - time[0]) / 60000;
+
+    var dataSet = sourceData.flowdata[0].widgetList;
+
+
+    var crossdata = crossfilter(dataSet);
+    var dimension = crossdata.dimension(function(d){
+        return [d.time, d.value]});
+
+    var group = dimension.group().reduce();
+
+
+   // console.log(dimension.top(100));
+
+    var line = dc.lineChart("#lineDiv")
+            .renderArea(false)
+            .width(990)
+            .height(200)
+            .transitionDuration(1000)
+            .margins({top: 30, right: 50, bottom: 25, left: 40})
+            .dimension(dimension)
+            .x(d3.time.scale().domain([new Date(time[0]), new Date(time[1])]))
+            .elasticY(true)
+            .renderHorizontalGridLines(true)
+            .legend(dc.legend().x(800).y(10).itemHeight(13).gap(5))
+            .brushOn(false)
+            .group(group)
+            .valueAccessor(function (d) {
+                return d.value;
+            })
+            .stack(group, function (d) {
+                return d.value;
+            });
+
+    line.render();
+
+</script>
+</body>
+</html>

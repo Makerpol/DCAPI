@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pie Chart</title>
+    <script src="lib/jquery.min.js"></script>
+    <script src="lib/d3.v3.min.js"></script>
+    <script src="lib/dc.min.js"></script>
+
+    <script src="lib/crossfilter.min.js"></script>
+    <script src="js/data.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/index.css">
+    <link rel="stylesheet" type="text/css" href="css/dc.css">
+</head>
+<body>
+<div class="widget">
+    <div id="pieDiv"></div>
+    <div id="barDiv"></div>
+    <div id="compositeDiv"></div>
+</div>
+
+<script type="text/javascript">
+    var sourceData = jQuery.parseJSON(pieData);
+
+    var time = sourceData.flowdata[0].duration;
+
+    var step = (sourceData.flowdata[0].widgetList[sourceData.flowdata[0].namelist.length].time - time[0]) / 60000;
+
+    var dataSet = sourceData.flowdata[0].widgetList;
+    var colorSettings = [
+        "#0168b3",
+        "#c3003a",
+        "#499475",
+        "#6c5776",
+        "#d5a02e",
+        "#44aeea",
+        "#cd5638",
+        "#71b174",
+        "#a44682",
+        "#d4c91f", // 10
+        "#487ca3",
+        "#c93a40",
+        "#81a47a",
+        "#d06da3",
+        "#e4ab5a",
+        "#8ebbdd",
+        "#dd9b9d",
+        "#87e7b0",
+        "#a5aad4",
+        "#eabd00", // 20
+        "#666666"
+    ];
+
+    //TODO pie
+    console.log(dataSet);
+
+    /**
+     * agentId是-1，表示这个数据是others的数据，只有在饼图的时候才会用到
+     *使用以下方式，可以在画线图时，过滤掉others的数据
+     */
+   /* var cro = crossfilter(dataSet);
+    var crodimension = cro.dimension(function(d){return d;});
+    crodimension.filter(function(d){
+        if(d.agentId == -1){
+            return 0;
+        }else{
+            return 1;
+        }
+    });
+
+    console.log(crodimension.top(dataSet.length));*/
+
+    var data = createPieData(dataSet);
+
+    var crossfilter_pie = crossfilter(data)
+    var pieDimension = crossfilter_pie.dimension(function(d){return d});
+
+    var pieGroup = pieDimension.group();
+
+    var pieChart = dc.pieChart("#pieDiv");
+
+    pieChart.width(950)
+            .height(500)
+            .radius(200)
+            .colors(colorSettings)
+            .dimension(pieDimension)
+            .group(pieGroup);
+
+    /**
+     * 点击饼图中的一个对象，就会把被点击对象隐藏
+     *
+     * 饼图实现隐藏的方法只能是删除数据，无法通过CSS实现。
+     * 因为要重新计算扇形角度
+     *
+     * @param d 被点击对象数据
+     */
+    pieChart.onClick = function(d){
+
+        pie = pieDimension.filter(d.key);
+
+        crossfilter_pie.remove();
+        crossfilter_pie.add(pie.top(5));
+
+        pieGroup = pieDimension.group();
+
+        pieChart.redraw();
+    }
+
+    pieChart.render();
+
+//================================================================================
+   //TODO brush
+
+    var bar = dc.barChart("#barDiv");
+
+    var cross_line = crossfilter(dataSet);
+    var lineDimension = cross_line.dimension(function(d){return d.order});
+    var lineGroup = lineDimension.group().reduceSum(function(d){return d.value});
+
+    var xAxisScale = d3.time.scale().domain([time[0], time[1]]);
+
+    bar.width(950)
+             .height(70)
+             .margins({top: 10, right: 50, bottom: 30, left: 40})
+             .dimension(lineDimension)
+             .group(lineGroup)
+             .elasticY(true)
+             .x(xAxisScale)
+             .xAxis();
+
+
+    //使用DC API 获取brush过滤后，选择的开始/结束范围
+    bar.on("filtered", function(chart){
+        var filters = chart.filters();
+        if(filters.length){
+            var cross_line = crossfilter(dataSet);
+            var dimension = cross_line.dimension(function(d){return d.time;})
+                    .filter([filters[0][0], filters[0][1].getTime() + (step*60000)]);
+            var data = dimension.top(dataSet.length);
+
+            console.log(data);
+            var pieData = createPieData(data);
+            reDrawPie(pieData);
+        }
+    });
+
+      bar.render();
+
+    bar.select("g.y").style("display", "none");
+
+
+
+    function reDrawPie(data){
+        var cross = crossfilter(data);
+        var dimension = cross.dimension(function(d){return d});
+        var group = dimension.group();
+
+        pieChart.dimension(dimension)
+                .group(group);
+
+        pieChart.redraw();
+    }
+    /**
+     *
+     * @param data
+     * @returns {Array}
+     */
+    function createPieData(data){
+
+        //按照name维度分组，获取不同name的分组统计
+        var crossData = crossfilter(data);
+        var group = crossData.dimension(function(d){return d.order;})
+                             .group(function(d){return d}).top(data.length);
+
+        var pieData = [];
+        for(var i = 0; i <  group.length; i++){
+            var groupData = group[i].key;
+            var sumValue = 0;
+            data.forEach(function(d){
+
+                if(groupData == d.order){
+                    sumValue = sumValue+d.value;
+                }
+            });
+            pieData.push(sumValue);
+        }
+
+        return pieData;
+    }
+
+</script>
+</body>
+</html>

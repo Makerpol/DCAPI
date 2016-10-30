@@ -1,0 +1,16 @@
+.widget{
+    width: 950px;
+    height: auto;
+}
+
+#pieDiv{
+    width: 950px;
+    height: 500px;
+}
+
+#brushDiv{
+    width: 950px;
+    height: 100px;
+}
+
+

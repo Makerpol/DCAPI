@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>dc.js multi-line chart attempt</title>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="lib/d3.v3.min.js"></script>
+    <script src="lib/dc.min.js"></script>
+    <script src="lib/crossfilter.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/dc.css"/>
+
+</head>
+
+<body>
+<div class="container">
+    <h1>Multi-Line Chart in dc.js</h1>
+
+    <div class="row">
+        <div id="data-count" class="span12">
+            Showing <span class="filter-count"/></span> of <span class="total-count"></span> data points
+            | <a href="javascript:dc.filterAll(); dc.renderAll();">Reset All</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div id="time-chart" class="dc-chart span6">
+            <strong>Time</strong>
+            <small class="text-muted">
+                <time id="date-start" datetime="2012-08-26 20:09-0700">8:09pm on August 26th, 2012</time> &ndash;
+                <time id="date-end" datetime="2012-08-26 20:09-0700">8:09pm on August 26th, 2012</time>
+            </small>
+            <a class="reset" href="javascript:time_chart.filterAll(); dc.redrawAll();" style="display: none;">
+                reset
+            </a>
+
+            <div class="clearfix"></div>
+        </div>
+
+        <div id="temp-chart" class="dc-chart span6">
+            <strong>Temperature</strong>
+            <a class="reset" href="javascript:temp_chart.filterAll(); dc.redrawAll();" style="display: none;">
+                reset
+            </a>
+
+            <div class="clearfix"></div>
+        </div>
+
+    </div>
+
+</div> <!-- end container -->
+
+<script type="text/javascript">
+    // charts
+    var time_chart = dc.compositeChart("#time-chart"),
+            temp_chart = dc.barChart("#temp-chart"),
+            width = temp_chart.root()[0][0].parentElement.clientWidth;
+
+    var coerce_row = function(d){
+        return {
+            time: new Date(+d[0] * 1000.0),
+            field: d[1],
+            temperature: +d[2],
+            count: +d[3],
+        };
+    };
+    var data = [
+        //['time', 'text', 'temperature', 'count'],
+        ['1379952000', 'field_1', 91, 56],
+        ['1379952000', 'field_2', 50, 20],
+        ['1379952000', 'field_3', 88, 24],
+        ['1379952000', 'field_4', 50, 37],
+        ['1379953200', 'field_1', 97, 58],
+        ['1379953200', 'field_2', 84, 86],
+        ['1379953200', 'field_3', 85, 62],
+        ['1379953200', 'field_4', 88, 73],
+        ['1379954400', 'field_1', 89, 38],
+        ['1379954400', 'field_2', 52, 26],
+        ['1379954400', 'field_3', 98, 66],
+        ['1379954400', 'field_4', 96, 38],
+        ['1379955600', 'field_1', 95, 98],
+        ['1379955600', 'field_2', 88, 12],
+        ['1379955600', 'field_3', 57, 95],
+        ['1379955600', 'field_4', 94, 80],
+        ['1379956800', 'field_1', 77, 51],
+        ['1379956800', 'field_2', 50, 19],
+        ['1379956800', 'field_3', 58, 23],
+        ['1379956800', 'field_4', 99, 29],
+        ['1379958000', 'field_1', 75, 28],
+        ['1379958000', 'field_2', 57, 16],
+        ['1379958000', 'field_3', 65, 53],
+        ['1379958000', 'field_4', 84, 37],
+        ['1379959200', 'field_1', 98, 72],
+        ['1379959200', 'field_2', 71, 63],
+        ['1379959200', 'field_3', 50, 68],
+        ['1379959200', 'field_4', 51, 72],
+        ['1379960400', 'field_1', 91, 64],
+        ['1379960400', 'field_2', 64, 77],
+        ['1379960400', 'field_3', 89, 13],
+        ['1379960400', 'field_4', 62, 85],
+        ['1379961600', 'field_1', 82, 69],
+        ['1379961600', 'field_2', 53, 70],
+        ['1379961600', 'field_3', 74, 48],
+        ['1379961600', 'field_4', 66, 29]
+    ];
+
+    var dataset = data.map(coerce_row);
+
+
+    var add = function(p, d){ return p + d.count;},
+            rem = function(p, d){ return p - d.count;},
+            ini = function(){ return 0;},
+            ndx = crossfilter(dataset),
+            all = ndx.groupAll().reduce(add, rem, ini),
+            time = ndx.dimension(function(d){ return d.time;}),
+            times = time.group().reduce(add, rem, ini),
+            field = ndx.dimension(function(d){ return d.field;}),
+            fields = field.group().reduce(add, rem, ini),
+            time_field = ndx.dimension(function(d) { return [d.time, d.field];}),
+            time_fields = time_field.group().reduce(add, rem, ini),
+            temperature = ndx.dimension(function(d){return d.temperature;}),
+            temperatures = temperature.group().reduce(add, rem, ini),
+            extent = d3.extent(dataset, function(d){return d.time;}),
+            date_format = d3.time.format("%b %d %I:%M %p");
+
+    console.log(time.top(100));
+    console.log(field.top(100));
+    console.log(time_field.top(100));
+    console.log(temperature.top(100));
+    
+    time_fields.all().forEach(function(d){
+        var key = d.key;
+        d.key = new Date(key[0]);
+        d.field = key[1];
+    });
+    //console.log(time_fields.top(100));
+
+
+
+    d3.select("#date-start")
+            .attr("datetime", extent[0])
+            .text(date_format(extent[0]));
+    d3.select("#date-end")
+            .attr("datetime", extent[1])
+            .text(date_format(extent[1]));
+
+    dc.dataCount("#data-count")
+            // Since the number of records (returned by .size()) isn't the same as the number
+            // of data points we're aggregating, supply a size-like object that returns the
+            // total number of data points represented.
+            .dimension({size: function(){return dataset.reduce(add, 0);}})
+            .group(all);
+
+    time_chart
+            .width(.5 * width)
+            .height(400)
+            .margins({top: 10, right: 10, bottom: 30, left: 60})
+            .dimension(time_field)
+            .group(time_fields)
+            .elasticY(true)
+            .elasticX(true)
+            .x(d3.time.scale().domain(extent))
+            .renderHorizontalGridLines(true)
+            .renderVerticalGridLines(true)
+            .brushOn(false)
+            .compose([
+                // TODO: how to add n lines, one for each value of d.data.field (i.e. field_1 ... field_n)?
+                dc.lineChart(time_chart)
+                        .title(function(d){ return d.data.field + " ("+ d.data.value + ")";})
+            ]);
+
+
+    temp_chart
+            .width(.5 * width)
+            .height(400)
+            .margins({top: 10, right: 10, bottom:30, left:60})
+            .dimension(temperature)
+            .group(temperatures)
+            .x(d3.scale.linear().domain([0, 100]))
+            .elasticY(true)
+            .renderHorizontalGridLines(true);
+
+    dc.renderAll();
+
+</script>
+</body>
+</html>
