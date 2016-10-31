@@ -61,16 +61,16 @@ var paymentsByTotal = payments.dimension(function(d) { return d.total; });
 没有必要在crossfilter以外派生值。只有当records添加到crossfilter中时才调用值函数。
 
 dimension一旦创建就会绑定到crossfilter。创建超过8个dimension和超过16个dimension
-会带来额外的开销。目前不支持一次超过32个dimension。但是可以用<a herf="">**dimension.dispose**</a>
+会带来额外的开销。目前不支持一次超过32个dimension。但是可以用<a href="">**dimension.dispose**</a>
 布置dimension来给新的dimension腾出空间。dimension的状态，记录关联的特定dimension的过滤器，如果真有的话。初期，如果dimension没有指定过滤器：所有的records都会被选中。由于创建dimension比较占用资源，因此应该谨慎保留对创建的任何dimension的引用。
 
 <a>#</a> dimension<b>.filter</b>(<i>value</i>)
 
 过滤records，使dimension值和<i>value</i>匹配，然后返回这个dimension。
->这个被指定的<i>value</i>如果是**null**，这种情况下此方法相当于<a herf="">**filterAll**</a>；
->这个<i>value</i>如果是**数组**，这种情况下此方法相当于<a herf="">**filterRange**</a>；
->这个<i>value</i>如果是**函数**，这种情况下此方法相当于<a herf="">**filterFunction**</a>；
->除此之外，此方法相当于<a herf="">**filterExact**</a>。
+>这个被指定的<i>value</i>如果是**null**，这种情况下此方法相当于<a href="">**filterAll**</a>；
+>这个<i>value</i>如果是**数组**，这种情况下此方法相当于<a href="">**filterRange**</a>；
+>这个<i>value</i>如果是**函数**，这种情况下此方法相当于<a href="">**filterFunction**</a>；
+>除此之外，此方法相当于<a href="">**filterExact**</a>。
 
 例：
 ````js
@@ -156,3 +156,4 @@ bottomPayments[1]; // the second-smallest payment
 ## Group (Map-Reduce)
 <a>#</a> dimension<b>.group</b>([<i>groupValue</i>])
 
+为给定的dimension构造一个新的群组，根据指定的<i>groupValue</i>函数，采取dimension的值作为输入值，并返回相应的四舍五入值。这个<i>groupValue</i>是可选的；如果不指定，则默认为<a href="https://en.wikipedia.org/wiki/Identity_function">恒等函数</a>；
