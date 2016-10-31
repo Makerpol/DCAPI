@@ -156,4 +156,12 @@ bottomPayments[1]; // the second-smallest payment
 ## Group (Map-Reduce)
 <a>#</a> dimension<b>.group</b>([<i>groupValue</i>])
 
-为给定的dimension构造一个新的群组，根据指定的<i>groupValue</i>函数，采取dimension的值作为输入值，并返回相应的四舍五入值。这个<i>groupValue</i>是可选的；如果不指定，则默认为<a href="https://en.wikipedia.org/wiki/Identity_function">恒等函数</a>；
+为给定的dimension构造一个新的群组，根据指定的<i>groupValue</i>函数，采取dimension的值作为输入值，并返回相应的四舍五入值。这个<i>groupValue</i>是可选的；如果不指定，则默认为<a href="https://en.wikipedia.org/wiki/Identity_function">恒等函数</a>。类似的值函数，<i>groupValue</i>必须返回自然有序的值；此外，这种顺序必须符合这个dimension的值函数。
+例：
+````js
+var paymentGroupsByTotal = paymentsByTotal.group(function(total) { return Math.floor(total / 100); });
+````
+
+默认情况下，这个group的reduce函数将计算每个组的记录数。此外，这个groups将按照记录数排序。
+
+注意：这个分组和crossfire当前的过滤器相交，**除了相关联的dimension的过滤器**。因此，group方法仅考虑满足除dimension的过滤器之外的每个过滤器的记录。所以，如果付款的ceossfilter是按照type和total过滤，则总额的group只按照type观察过滤器。
