@@ -51,8 +51,7 @@ var payments = crossfilter([
 
 特别是，注意<kbd>null</kbd>和<kbd>undefined</kbd>是不支持的。此外，混合类型应该采用，例如：字符串和数字。
 如果字符串和数字混合，那么字符串将会强制转换成数字，因此字符串必须可以强制转换成数字，否则就会导致<kbd>NaN</kbd>。
-
-例：通过付款总额创建新的dimension
+例：
 ````javascript
 var paymentsByTotal = payments.dimension(function(d) { return d.total; });
 ````
@@ -62,5 +61,98 @@ var paymentsByTotal = payments.dimension(function(d) { return d.total; });
 没有必要在crossfilter以外派生值。只有当records添加到crossfilter中时才调用值函数。
 
 dimension一旦创建就会绑定到crossfilter。创建超过8个dimension和超过16个dimension
-会带来额外的开销。目前不支持一次超过32个dimension。但是可以用<a>**dimension.dispose**</a>
-布置dimension来给新的dimension腾出空间。
+会带来额外的开销。目前不支持一次超过32个dimension。但是可以用<a herf="">**dimension.dispose**</a>
+布置dimension来给新的dimension腾出空间。dimension的状态，记录关联的特定dimension的过滤器，如果真有的话。初期，如果dimension没有指定过滤器：所有的records都会被选中。由于创建dimension比较占用资源，因此应该谨慎保留对创建的任何dimension的引用。
+
+<a>#</a> dimension<b>.filter</b>(<i>value</i>)
+
+过滤records，使dimension值和<i>value</i>匹配，然后返回这个dimension。
+>这个被指定的<i>value</i>如果是**null**，这种情况下此方法相当于<a herf="">**filterAll**</a>；
+>这个<i>value</i>如果是**数组**，这种情况下此方法相当于<a herf="">**filterRange**</a>；
+>这个<i>value</i>如果是**函数**，这种情况下此方法相当于<a herf="">**filterFunction**</a>；
+>除此之外，此方法相当于<a herf="">**filterExact**</a>。
+
+例：
+````js
+paymentsByTotal.filter([100, 200]); // 选取总额在100到200之间的付款
+paymentsByTotal.filter(120); // 选取总额等于120的付款
+paymentsByTotal.filter(function(d) { return d % 2; }); // 选取总额是奇数的付款
+paymentsByTotal.filter(null); // 选取所有的付款
+````
+<i>如果调用过滤器将会替换现有的过滤器,如果dimension有的话</i>
+
+<a>#</a> dimension<b>.filterExact</b>(<i>value</i>)
+
+过滤records，使dimension值和<i>value</i>匹配，然后返回这个dimension。
+例：
+````js
+paymentsByTotal.filterExact(120); // 选取总额等于120的付款
+````
+注意使用排序运算符<kbd><</kbd>, <kbd><=</kbd>和<kbd>></kbd>,<kbd>>=</kbd>进行精确比较。例如，如果传递的值是**null**， 这相当于0；
+过滤不要用<kbd>==</kbd>和<kbd>===</kbd>运算符。
+
+<i>如果调用过滤器将会替换现有的过滤器,如果dimension有的话</i>
+
+<a>#</a> dimension<b>.filterRange</b>(<i>range</i>)
+
+过滤records，使dimension值大于等于<i>range[0]</i>，小于<i>range[1]</i>，返回这个dimension。
+例： 
+````js
+paymentsByTotal.filterRange([100, 200]); // 选取总额在100到200之间的付款
+````
+
+<a>#</a> dimension<b>.filterFunction</b>(<i>function</i>)
+
+过滤records，被调用时使用指定的函数返回dimension值的真值，并返回dimension。
+例：
+````js
+paymentsByTotal.filterFunction(function(d) { return d % 2; }); // // 选取总额是奇数的付款
+````
+这可以用于实现联合过滤器，例如：
+````js
+// 选取总额在0到10或者20到30之间的付款
+paymentsByTotal.filterFunction(function(d) { return 0 <= d && d < 10 || 20 <= d && d < 30; });
+````
+
+<a>#</a> dimension<b>.filterAll</b>()
+
+清除任何dimension的过滤器，选取所有的records并返回dimension。
+例：
+````js
+paymentsByTotal.filterAll(); // 选取所有的付款
+````
+
+<a>#</a> dimension<b>.top</b>(<i>k</i>)
+
+返回一个包含前<i>k</i>个records的数组，根据此dimension的自然顺序。被返回的数组是按照降序的自然顺序进行排列。这个方法和crossfilter当前的过滤器相交，只返回满足所有能动的过滤器（包括此维度的过滤器）的records。
+例：
+````js
+var topPayments = paymentsByTotal.top(4); // the top four payments, by total
+topPayments[0]; // the biggest payment
+topPayments[1]; // the second-biggest payment
+// etc.
+````
+如果根据crossfilter所有的过滤器选择的records比<i>k</i>少，那就返回一个少于<i>k</i>的数组。
+例：
+````js
+var allPayments = paymentsByTotal.top(Infinity); //返回所有的
+````
+
+<a>#</a> dimension<b>.bottom</b>(<i>k</i>)
+
+返回一个包含后<i>k</i>个records的数组，根据此dimension的自然顺序。被返回的数组是按照升序的自然顺序进行排列。这个方法和crossfilter当前的过滤器相交，只返回满足所有能动的过滤器（包括此维度的过滤器）的records。
+例：
+````js
+var bottomPayments = paymentsByTotal.bottom(4); // the bottom four payments, by total
+bottomPayments[0]; // the smallest payment
+bottomPayments[1]; // the second-smallest payment
+// etc.
+````
+<a>#</a> dimension<b>.dispose</b>()
+
+删除这个dimension（包括它的groups）从crossfilter。这为添加到这个crossfilter其他的dimension释放了空间。
+
+
+## Group (Map-Reduce)
+<a>#</a> dimension<b>.group</b>([<i>groupValue</i>])
+
