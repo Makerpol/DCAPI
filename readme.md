@@ -165,3 +165,25 @@ var paymentGroupsByTotal = paymentsByTotal.group(function(total) { return Math.f
 默认情况下，这个group的reduce函数将计算每个组的记录数。此外，这个groups将按照记录数排序。
 
 注意：这个分组和crossfire当前的过滤器相交，**除了相关联的dimension的过滤器**。因此，group方法仅考虑满足除dimension的过滤器之外的每个过滤器的记录。所以，如果付款的ceossfilter是按照type和total过滤，则总额的group只按照type观察过滤器。
+
+<a>#</a> dimension<b>.size</b>()
+
+返回group中不同值的数量，无关任何过滤器；基础数据。
+
+<a>#</a> dimension<b>.reduce</b>(<i>add, remove, initial</i>)
+
+指定分组的reduce函数，并返回这个group。默认的行为，通过count进行减少。
+例：
+````js
+function reduceAdd(p, v) {
+  return p + 1;
+}
+
+function reduceRemove(p, v) {
+  return p - 1;
+}
+
+function reduceInitial() {
+  return 0;
+}
+````
