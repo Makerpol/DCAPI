@@ -46,10 +46,10 @@ var payments = crossfilter([
 <a name="crossfilter_dimension" href="#crossfilter_dimension">#</a> crossfilter<b>.dimension</b>(<i>value</i>)
 
 使用指定的值访问器函数构造一个新的dimension。这个函数必须返回自然有序的值，即：
-正确的行为关于javascript的<kbd><</kbd>, <kbd><=</kbd>和<kbd>></kbd>,<kbd>>=</kbd>运算符。
+正确的行为关于javascript的`<`, `<=`和`>`,`>=`运算符。
 这通常意味着基础数据：booleans，数字或者字符串； 然而： 可以重写object.valueOf来保证这个值和给定的对象值相似，如日期。
 
-特别是，注意<kbd>null</kbd>和<kbd>undefined</kbd>是不支持的。此外，混合类型应该采用，例如：字符串和数字。
+特别是，注意`null`和`undefined`是不支持的。此外，混合类型应该采用，例如：字符串和数字。
 如果字符串和数字混合，那么字符串将会强制转换成数字，因此字符串必须可以强制转换成数字，否则就会导致<kbd>NaN</kbd>。
 例：
 ````javascript
@@ -88,8 +88,8 @@ paymentsByTotal.filter(null); // 选取所有的付款
 ````js
 paymentsByTotal.filterExact(120); // 选取总额等于120的付款
 ````
-注意使用排序运算符<kbd><</kbd>, <kbd><=</kbd>和<kbd>></kbd>,<kbd>>=</kbd>进行精确比较。例如，如果传递的值是**null**， 这相当于0；
-过滤不要用<kbd>==</kbd>和<kbd>===</kbd>运算符。
+注意使用排序运算符`<`, `<=`和`>`,`>=`进行精确比较。例如，如果传递的值是**null**， 这相当于0；
+过滤不要用`==`和`===`运算符。
 
 <i>如果调用过滤器将会替换现有的过滤器,如果dimension有的话</i>
 
@@ -268,7 +268,7 @@ topTypes[0].value; // the count of payments of that type (e.g., 8)
 
 <a name="group_all" href="#group_all">#</a> group<b>.all</b>()
 
-返回包含所有的组的数组，按照key的升序排列。就像<a href="#group_top">top</a>，被返回的对象包含'key'和'value'两个属性。被返回的数组也有可能包含空的组：group缩减初始化函数返回的值。
+返回包含所有的组的数组，按照key的升序排列。就像<a href="#group_top">top</a>，被返回的对象包含`key`和`value`两个属性。被返回的数组也有可能包含空的组：group缩减初始化函数返回的值。
 例：
 ````js
 //通过类型计数付款
