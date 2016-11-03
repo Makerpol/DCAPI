@@ -50,7 +50,7 @@ var payments = crossfilter([
 这通常意味着基础数据：booleans，数字或者字符串； 然而： 可以重写object.valueOf来保证这个值和给定的对象值相似，如日期。
 
 特别是，注意`null`和`undefined`是不支持的。此外，混合类型应该采用，例如：字符串和数字。
-如果字符串和数字混合，那么字符串将会强制转换成数字，因此字符串必须可以强制转换成数字，否则就会导致<kbd>NaN</kbd>。
+如果字符串和数字混合，那么字符串将会强制转换成数字，因此字符串必须可以强制转换成数字，否则就会导致`NaN`。
 例：
 ````javascript
 var paymentsByTotal = payments.dimension(function(d) { return d.total; });
