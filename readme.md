@@ -302,7 +302,18 @@ crossfilter有几个额外的东西，你应该会感觉很有用。
 
 恒等平分；适用于数字，字符串，日期和自然可比的对象。
 
+<a name="crossfilter_bisect_by" href="#crossfilter_bisect_by">#</a> crossfilter.bisect<b>.by</b>(<i>value</i>)
 
+使用指定的<i>value</i>访问器构建一个新的平分器，这个访问器必须能返回一个自然有序的值。
+例：
+````js
+//通过属性foo将对象数组对分
+var bisectByFoo = crossfilter.bisect.by(function(d) { return d.foo; });
+````
+返回的对象也是<a href="#bisect_right">bisect.right</a>函数。
+
+<a name="bisect" href="#bisect">#</a> <b>bisect</b>(<i>array, value, lo, hi</i>)
+<a name="bisect_right" href="#bisect_right">#</a> bisect<b>.right</b>(<i>array, value, lo, hi</i>)
 
 
 
