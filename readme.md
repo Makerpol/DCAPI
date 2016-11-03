@@ -313,6 +313,7 @@ var bisectByFoo = crossfilter.bisect.by(function(d) { return d.foo; });
 返回的对象也是<a href="#bisect_right">bisect.right</a>函数。
 
 <a name="bisect" href="#bisect">#</a> <b>bisect</b>(<i>array, value, lo, hi</i>)
+
 <a name="bisect_right" href="#bisect_right">#</a> bisect<b>.right</b>(<i>array, value, lo, hi</i>)
 
 
