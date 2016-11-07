@@ -296,6 +296,8 @@ var types = paymentCountByType.all();
 
 
 ## Extras
+>这部分完全不能理解，正在实际检验学习中。
+
 crossfilter有几个额外的东西，你应该会感觉很有用。
 
 <a name="crossfilter_bisect" href="#crossfilter_bisect">#</a> crossfilter<b>.bisect</b>
@@ -315,6 +317,7 @@ var bisectByFoo = crossfilter.bisect.by(function(d) { return d.foo; });
 <a name="bisect" href="#bisect">#</a> <b>bisect</b>(<i>array, value, lo, hi</i>)<br>
 <a name="bisect_right" href="#bisect_right">#</a> bisect<b>.right</b>(<i>array, value, lo, hi</i>)
 
+类似<a href="#bisect_left">bisect.left</a>，但返回一个插入点，在**array**中的任何现有的输入**value**的后边（右边）。
 
 
 ***
