@@ -296,7 +296,7 @@ var types = paymentCountByType.all();
 
 
 ## Extras
->这部分完全不能理解，正在实际检验学习中。
+>正在实际检验学习中。
 
 crossfilter有几个额外的东西，你应该会感觉很有用。
 
@@ -306,7 +306,7 @@ crossfilter有几个额外的东西，你应该会感觉很有用。
 
 <a name="crossfilter_bisect_by" href="#crossfilter_bisect_by">#</a> crossfilter.bisect<b>.by</b>(<i>value</i>)
 
-使用指定的<i>value</i>访问器构建一个新的平分器，这个访问器必须能返回一个自然有序的值。
+使用指定的<i>value</i>访问器构建一个新的平分器，这个访问器必须返回一个自然有序的值。
 例：
 ````js
 //通过属性foo将对象数组对分
@@ -314,11 +314,33 @@ var bisectByFoo = crossfilter.bisect.by(function(d) { return d.foo; });
 ````
 返回的对象也是<a href="#bisect_right">bisect.right</a>函数。
 
-<a name="bisect" href="#bisect">#</a> <b>bisect</b>(<i>array, value, lo, hi</i>)<br>
+<a name="bisect" href="#bisect">#</a> <b>bisect</b>(<i>array, value, lo, hi</i>)
 <a name="bisect_right" href="#bisect_right">#</a> bisect<b>.right</b>(<i>array, value, lo, hi</i>)
 
-类似<a href="#bisect_left">bisect.left</a>，但返回一个插入点，在**array**中的任何现有的输入**value**的后边（右边）。
+><i>value</i>翻译成插入值/分隔值更合适？
+
+类似<a href="#bisect_left">bisect.left</a>，但返回一个插入点，这个值是在<i>array</i>中任意现有输入的<i>value</i>之后（右边）。返回的插入点<i>i</i>把<i>array</i>分成两部分：数组中所有在array.silce(lo,i)范围中的v <= <i>value</i>为左半部分；数组中所有在array.silce(i,hi)范围中的v > <i>value</i>为左半部分；
+
+<a name="bisect_left" href="#bisect_left">#</a> bisect<b>.left</b>(<i>array, value, lo, hi</i>)
+
+定位数组<i>array</i>中<i>value</i>的插入点，以保持已有的顺序。参数<i>lo</i>和<i>hi</i>用来指定应该考虑的数组<i>array</i>的子集。
+
+
+
+
+
 
 
 ***
-参考：<a href="https://github.com/square/crossfilter/wiki/API-Reference">crossfilter API 原文</a>
+### 源码解读心得
+- 一个正整数无符号右移1位，所得结果是其本身的一半(奇数的一半直接取整数部分)
+
+````js
+1024>>>1  //512
+
+3>>>1  //1
+````
+
+***
+参考：
+<a href="https://github.com/square/crossfilter/wiki/API-Reference">crossfilter API 原文</a>
