@@ -1,3 +1,9 @@
+## DC学习
+dc.js是一个以d3.js为基础的数据可视化工具，结合crossfilter.js数据处理，让可视化围绕着数据变化而变化。因此要想学dc.js，必须先学习<a href="https://github.com/d3/d3/wiki/API--%E4%B8%AD%E6%96%87%E6%89%8B%E5%86%8C#d3time-time">d3.js</a>和<a href="https://github.com/square/crossfilter/wiki/API-Reference">crossfilter.js</a>这两个库。
+
+d3.js已经存在中文API翻译，D3v4版API请参照<a href="https://github.com/xswei/D3-V4-API-CN">D3-V4-API-CN</a>。
+下面开始crossfilter的API翻译以及学习，我会一边翻译，一边学习检验，尽量做到接近作者的以数据为核心的可视化思想。
+
 ## Crossfilter API Reference
 crossfilter 表示多维数组集
 
