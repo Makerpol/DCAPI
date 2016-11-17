@@ -181,7 +181,7 @@ var paymentGroupsByTotal = paymentsByTotal.group(function(total) { return Math.f
 指定分组的reduce函数，并返回这个group。默认的行为，通过count进行缩减。
 例：
 ````js
-//p是上一数据，v是当前数据
+//p是初始化函数返回的对象，v是当前数据
 function reduceAdd(p, v) {
   return p + 1;
 }
